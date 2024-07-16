@@ -1,0 +1,20 @@
+start = 0
+end = 4
+result = 1
+fac(n) = for i in 1 to n {
+       result =  result * i
+       print(111111, result, i)
+}
+re = 0
+fn(n, f , x) = ((x ^ n) / fac(f, 1))
+f = 2
+
+for n in 0 to 4 {
+    result = 1
+    f = n + 2
+    
+
+}
+
+
+
