@@ -40,9 +40,9 @@ pub enum TokenType {
     Equal,
     EqualEqual,
     Less,
-    LessEqual,
+    PlusEqual,
     Greater,
-    GreaterEqual,
+    MinusEqual,
 
 
     To,
@@ -83,9 +83,9 @@ impl fmt::Display for TokenType {
             TokenType::Equal => write!(f, "Equal"),
             TokenType::EqualEqual => write!(f, "EqualEqual"),
             TokenType::Less => write!(f, "Less"),
-            TokenType::LessEqual => write!(f, "LessEqual"),
+            TokenType::MinusEqual => write!(f, "MinusEqual"),
             TokenType::Greater => write!(f, "Greater"),
-            TokenType::GreaterEqual => write!(f, "GreaterEqual"),
+            TokenType::PlusEqual => write!(f, "PlusEqual"),
             TokenType::To => write!(f, "To"),
             TokenType::In => write!(f, "In"),
             TokenType::Return => write!(f, "Return"),

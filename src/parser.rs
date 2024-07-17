@@ -13,6 +13,12 @@ pub struct AssignmentImpl {
     pub value: Box<Expr>,
 }
 #[derive(Debug,Clone)]
+pub struct DoubleImpl {
+    pub target: VariableImpl,
+    pub op: TokenType,
+    pub value: Box<Expr>,
+}
+#[derive(Debug,Clone)]
 pub struct BinaryOpImpl {
    pub  left: Box<Expr>,
    pub  operation: Token,
@@ -36,13 +42,13 @@ pub struct VariableImpl {
 pub struct FnImpl {
     pub name: Token,
     pub params: Vec<VariableImpl>,
-    pub expr: Box<Expr>
+    pub expr: Vec<Rc<RefCell<Expr>>>
 }
 
 #[derive(Debug,Clone)]
 pub struct FncallImpl {
     pub name: Token,
-    pub args: Vec<VariableImpl>
+    pub args: Vec<Rc<RefCell<Expr>>>,
 }
 #[derive(Debug,Clone)]
 pub struct ForImpl {
@@ -74,6 +80,7 @@ pub enum Expr {
     Fncall(FncallImpl),
     Veccall(VecCall),
     Forloop(ForImpl),
+    Double(DoubleImpl),
     Useless
     
 }
@@ -103,6 +110,21 @@ fn find_token(expected1: TokenType,expected2: TokenType, tokens: & Vec<Token>) -
         
     }
     return a;
+}
+fn separate_tokens(typetok: TokenType, tokens: &mut Vec<Token>) -> Vec<Token> {
+    let mut result = Vec::new();
+    while &tokens[&tokens.len() -1 ].kind != &typetok {
+        if &tokens[&tokens.len() -1 ].kind == &TokenType::RightParen {
+            result.reverse();
+            return result;
+        } else {
+            
+            result.push(tokens.pop().unwrap());
+        }  
+    }
+    match_token(typetok, tokens);
+    result.reverse();
+    result
 }
 
 
@@ -135,7 +157,22 @@ fn parse_assigment(tokens: &mut Vec<Token>) -> Expr {
         let value = parse_expr(tokens);
 
         return Expr::Assignment(AssignmentImpl{ target: variable,value:  Box::new(value)});
+    } else if tokens.len() > 1 && &tokens[tokens.len() -  2 ].kind == &TokenType::PlusEqual {
+        let variable = parse_variable(tokens);
+        match_token(TokenType::PlusEqual, tokens);
+
+        let value = parse_expr(tokens);
+
+        return Expr::Double(DoubleImpl{ target: variable,op: TokenType::PlusEqual,value:  Box::new(value)});
     } 
+    else if tokens.len() > 1 && &tokens[tokens.len() -  2 ].kind == &TokenType::MinusEqual {
+        let variable = parse_variable(tokens);
+        match_token(TokenType::MinusEqual, tokens);
+
+        let value = parse_expr(tokens);
+
+        return Expr::Double(DoubleImpl{ target: variable,op: TokenType::MinusEqual,value:  Box::new(value)});
+    }
     else if tokens.len() > 4 && find_token(TokenType::Equal,TokenType::RightParen, &tokens) {
 
         let fnnew = parse_fn(tokens);
@@ -167,6 +204,7 @@ fn parse_variable(tokens: &mut Vec<Token>) -> VariableImpl {
 fn parse_fn(tokens: &mut Vec<Token>) -> FnImpl {
     let mut name: Token = Token { kind: TokenType::Eof, value: "".to_string() };
     let mut params: Vec<VariableImpl> = Vec::new();
+    let mut vecexpr: Vec<Rc<RefCell<Expr>>> = Vec::new();
     let token = tokens.pop().unwrap();
     if token.kind == TokenType::Id {
             name = token;    
@@ -190,8 +228,22 @@ fn parse_fn(tokens: &mut Vec<Token>) -> FnImpl {
 
     match_token(TokenType::RightParen, tokens);
     match_token(TokenType::Equal, tokens);
-    let expr = parse_expr(tokens);
-    return FnImpl {name: name, params: params,expr: Box::new(expr)};
+    if &tokens[&tokens.len() - 1].kind == &TokenType::LeftBrace{
+
+        match_token(TokenType::LeftBrace, tokens);
+        while &tokens[&tokens.len() -1 ].kind != &TokenType::RightBrace {
+            match &tokens[&tokens.len()-1].kind {
+                &TokenType::Eof => match_token(TokenType::Eof, tokens),
+                _ => vecexpr.push(Rc::new(RefCell::new(parse_expr(tokens))))
+              }
+        }
+        match_token(TokenType::RightBrace, tokens);
+    }
+    else {
+        vecexpr.push(Rc::new(RefCell::new(parse_expr(tokens))));
+    }
+    
+    return FnImpl {name: name, params: params,expr: vecexpr};
 }
 fn parse_for_loop(tokens: &mut Vec<Token>) -> ForImpl {
     let _ = tokens.pop().unwrap();
@@ -283,8 +335,8 @@ pub fn parse_unary(tokens: &mut Vec<Token>)  -> Expr {
    }
 }
 fn parse_primary(tokens: &mut Vec<Token>) -> Expr {
-    let  token = tokens.pop().unwrap();
     
+    let  token = tokens.pop().unwrap();
     if token.kind != TokenType::Eof {
     match token.kind {
         TokenType::Number(x) => {
@@ -298,23 +350,11 @@ fn parse_primary(tokens: &mut Vec<Token>) -> Expr {
 
                     tokens.pop().unwrap();
 
-                    let mut args = Vec::new();
+                    let mut args: Vec<Rc<RefCell<Expr>>> = Vec::new();
                     while &tokens[tokens.len() -1].kind != &TokenType::RightParen {
-                        let token = tokens.pop().unwrap();
-                        match token.kind {
-                        TokenType::LeftParen => {},
-                        TokenType::Id => args.push(VariableImpl {name: token}),
-                        TokenType::Number(x) => args.push(VariableImpl {name: token}),
-                        TokenType::Comma => {
-                               match &tokens[tokens.len() -1 ].kind {
-                                &TokenType::Number(x) => {},
-                                &TokenType::Id => {},
-                                _ => panic!("You need a argument after , "),
-                               } 
-                           },
-                        
-                        _ => panic!("error no use like this {:?}", token)
-                        }
+                        let mut one_token = separate_tokens(TokenType::Comma, tokens);
+                        let one_arg  = parse_expr(&mut one_token);
+                        args.push(Rc::new(RefCell::new(one_arg)));
                    }
                     match_token(TokenType::RightParen, tokens);
 
@@ -336,6 +376,7 @@ fn parse_primary(tokens: &mut Vec<Token>) -> Expr {
                     }
                     
                     match_token(TokenType::Greater, tokens);
+                    
                     return Expr::Veccall(VecCall { name: vec_name, index:  index})
 
                 }

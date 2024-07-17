@@ -1,4 +1,7 @@
 use std::string;
+use std::rc::Rc;
+use std::cell::RefCell;
+
 
 use crate::tokens::{Token, TokenType};
 use crate::parser::{Expr, ForImpl};
@@ -79,44 +82,46 @@ impl Interpreter {
                 }
                 return val;
             },
+            Expr::Double(x) => {
+                let expr = Interpreter::new(*x.value, self.fn_name.clone());
+                let mut val: f32;
+                if x.op == TokenType::PlusEqual {
+                     val = expr.evaluate(gl, &x.target.name) + gl.find_var_value(&x.target.name.value, &self.fn_name);
+                } else if  x.op == TokenType::MinusEqual{
+                     val = expr.evaluate(gl, &x.target.name) - gl.find_var_value(&x.target.name.value, &self.fn_name);
+                } else {
+                    panic!("Not implemented yet other double operations!");
+                }
+                if !self.vec_assign {
+                    gl.add_var(x.target.name.value, val);
+                    self.vec_assign = false;
+                }
+                return val;
+            },
             Expr::Fncall(x) => {
                 let mut result: f32 = 1234.0;
                 match x.name.value.as_str() {
                      "print" => {
                         for var in x.args.iter() {
-                            let vrbl = &var.name;
-                            match  &vrbl.kind { 
-                                TokenType::Number(y) => {
-                                    println!("{}", y);
-                                    result += y;
-                            },
-                                TokenType::Id => {
-                                    println!("{}", gl.find_var_value(&vrbl.value,&self.fn_name));
-                                }
-                                _ => panic!("Error -> Interpreter_Var"),
-            
-                            }
+                            let ex = Interpreter::new(var.borrow().clone(), self.fn_name.clone());
+                            println!("-> {} ", ex.evaluate(gl, assignment_token));
                         }
                     },
                     str => {
                         if gl.fn_exist(&str.to_string()) {
                                let mut agrsvec = Vec::new();
                                for arg in x.args {
-                                   match arg.name.kind {
-                                     TokenType::Number(num) => {
-                                        agrsvec.push(num);
-                                    },
-                                     TokenType::Id => {
-                                        agrsvec.push(*gl.find_var_value(&arg.name.value, &self.fn_name));
-                                     },
-                                     _ => panic!("Error -> Fncall: unkown argument type")
-                                   }
+                                   let ex = Interpreter::new(arg.borrow().clone(), self.fn_name.clone());
+                                   agrsvec.push(ex.evaluate(gl, assignment_token));
                                }
                                self.fn_name = str.to_string();
                                gl.setup_local(str.to_string(),agrsvec);
                                let expr = gl.find_fn_expr(&str.to_string());
-                               let fn_inter = Interpreter::new(expr, self.fn_name);
-                               result = fn_inter.evaluate(gl, assignment_token);
+                               for exp in expr.iter() {
+                                  let fn_inter = Interpreter::new(exp.borrow().clone(), self.fn_name.clone());
+                                  result = fn_inter.evaluate(gl, assignment_token);
+                               };
+                               
                                
                         } else{
                             println!("Error -> Fncall no fn named {} is found", str);
@@ -153,16 +158,14 @@ impl Interpreter {
                }
            },
            Expr::Fnassign(x) => {
-               if !gl.fn_exist(&x.name.value) {
+               
                     let mut paramvec = Vec::new();
                     for par in x.params {
                         paramvec.push(par.name.value)
                     }
                     gl.add_fn(x.name.value, x.expr,paramvec );
                     return 0.0;
-               } else {
-                panic!("not implemented yet to overwrite existing fns");
-               }
+               
            },
            Expr::Forloop(x) => {
              let mut result: f32 = 0.0;

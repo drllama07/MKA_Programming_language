@@ -2,10 +2,10 @@ use std::{collections::HashMap};
 use crate::{parser::Expr, tokens::{Token, TokenType}};
 use std::rc::Rc;
 use std::cell::RefCell;
-pub struct FnExpr {
+/*pub struct FnExpr {
     vecstore: Vec<Rc<RefCell<Expr>>>,
     fn_hash: HashMap<String, usize>
-}
+}*/
 #[derive(Debug, Clone)]
 pub struct LocalVar {
     position: HashMap<String, usize>,
@@ -16,7 +16,7 @@ pub struct Environment<'a> {
     name: &'a str,
     var_hash: HashMap<String, f32>,
     vec_hash: HashMap<String, Vec<f32>>,
-    fn_store: HashMap<String,Rc<RefCell<Expr>>>,
+    fn_store: HashMap<String, Rc<RefCell<Vec<Rc<RefCell<Expr>>>>>>,
     fn_local: HashMap<String, LocalVar>,
     
 }
@@ -66,8 +66,12 @@ impl  Environment<'_> {
         }
     }
 
-    pub fn add_fn(&mut self, fn_name: String, inner_exp: Box<Expr>, params: Vec<String>) {
-        self.fn_store.insert(fn_name.clone(), Rc::new(RefCell::new(*inner_exp)));
+    pub fn add_fn(&mut self, fn_name: String, inner_exp: Vec<Rc<RefCell<Expr>>>, params: Vec<String>) {
+        if self.fn_local.contains_key(&fn_name) {
+           self.fn_store.remove(&fn_name);
+           self.fn_store.remove(&fn_name);
+        }
+        self.fn_store.insert(fn_name.clone(), Rc::new(RefCell::new(inner_exp)));
         self.fn_local.insert(fn_name.clone(), LocalVar {position: HashMap::new(), value: Vec::new()});
         let mut index:usize = 0;
         for i in params.iter() {
@@ -82,8 +86,8 @@ impl  Environment<'_> {
         let index = varlocal.position.get(local_var).unwrap();
         &varlocal.value[*index]
     }
-    pub fn find_fn_expr(&mut self, fn_name: &String) -> Expr  {
-        self.fn_store.get(fn_name).unwrap().borrow().clone()   
+    pub fn find_fn_expr(&mut self, fn_name: &String) -> Vec<Rc<RefCell<Expr>>> {
+        self.fn_store.get(fn_name).unwrap().borrow().clone()
     }
     pub fn setup_local(&mut self, fn_name: String,params: Vec<f32>) {
         let hash = self.fn_local.get_mut(&fn_name).unwrap();

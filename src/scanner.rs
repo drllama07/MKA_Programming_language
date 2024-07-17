@@ -16,8 +16,8 @@ pub fn is_two_op(st: String) -> TokenType {
         
         "!=" => TokenType::BangEqual,
         "==" => TokenType::EqualEqual,
-        "<=" => TokenType::LessEqual,
-        ">="=> TokenType::GreaterEqual,
+        "-=" => TokenType::MinusEqual,
+        "+="=> TokenType::PlusEqual,
         _ => todo!()
     }
 }
@@ -107,7 +107,7 @@ pub fn matcher(c: char) -> TokenType {
 pub fn lexer(input: &mut String) -> Vec<Token> {
     let mut tokens: Vec<Token> = Vec::new();
     let mut c: char;
-    let double_chars = "<>=!";
+    let double_chars = "+-=!";
     while input.len() > 0 {
         c = input.chars().next().unwrap();
         if !c.is_whitespace() {
@@ -121,6 +121,7 @@ pub fn lexer(input: &mut String) -> Vec<Token> {
                 tokens.push(Token {kind: is_two_op(second_val), value: "operation".to_string()});
                 input.remove(0);
                 input.remove(0);
+                continue;
               } 
 
               if is_letter(c) {
