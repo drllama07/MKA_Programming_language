@@ -197,7 +197,7 @@ fn parse_variable(tokens: &mut Vec<Token>) -> VariableImpl {
     if token.kind == TokenType::Id {
            return VariableImpl { name: token};
     } else {
-        panic!("UFO -> from the AST");
+        panic!("Error -> Parsing_Variable: Unknown type of token{}", token.kind);
     }
 }
 

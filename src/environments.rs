@@ -55,6 +55,14 @@ impl  Environment<'_> {
     pub fn find_vec_value<'a>(&'a self, vec_name: &String, index: usize) -> &'a f32 {
         &self.vec_hash.get(vec_name).unwrap()[index]
     }
+    pub fn push_vec_value<'a>(&'a mut self, vec_name: &String, index: usize, value: f32) -> &'a f32 {
+        self.vec_hash.get_mut(vec_name).unwrap()[index] = value;
+        &self.vec_hash.get(vec_name).unwrap()[index]
+    }
+    pub fn pop_vec_value<'a>(&'a mut self, vec_name: &String, index: usize) ->  f32 {
+        self.vec_hash.get_mut(vec_name).unwrap().remove(index)
+        
+    }
 
     pub fn add_vec(&mut self, vec_name: String, vec_value: Vec<f32>) {
         if self.vec_hash.contains_key(&vec_name){

@@ -1,3 +1,4 @@
+
 use std::string;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -107,6 +108,120 @@ impl Interpreter {
                             println!("-> {} ", ex.evaluate(gl, assignment_token));
                         }
                     },
+                    "sin" => {
+                        if x.args.len() == 1 {
+                            let ex = Interpreter::new(x.args[0].borrow().clone(), self.fn_name.clone());
+                            result =  ex.evaluate(gl, assignment_token).sin();
+                        } else {
+                            panic!("You cannot pass no more than 1 value to sin()")
+                        }
+                    },
+                    "cos" => {
+                        if x.args.len() == 1 {
+                            let ex = Interpreter::new(x.args[0].borrow().clone(), self.fn_name.clone());
+                            result =  ex.evaluate(gl, assignment_token).cos();
+                        } else {
+                            panic!("You cannot pass no more than 1 value to cos()")
+                        }
+                    },
+                    "tan" => {
+                        if x.args.len() == 1 {
+                            let ex = Interpreter::new(x.args[0].borrow().clone(), self.fn_name.clone());
+                            result =  ex.evaluate(gl, assignment_token).tan();
+                        } else {
+                            panic!("You cannot pass no more than 1 value to tan()")
+                        }
+                    },
+                    "cot" => {
+                        if x.args.len() == 1 {
+                            let ex = Interpreter::new(x.args[0].borrow().clone(), self.fn_name.clone());
+                            result =  1.0 / ex.evaluate(gl, assignment_token).tan();
+                        } else {
+                            panic!("You cannot pass no more than 1 value to cot()")
+                        }
+                    },
+                    "csc" => {
+                        if x.args.len() == 1 {
+                            let ex = Interpreter::new(x.args[0].borrow().clone(), self.fn_name.clone());
+                            result =  1.0 / ex.evaluate(gl, assignment_token).sin();
+                        } else {
+                            panic!("You cannot pass no more than 1 value to csc()")
+                        }
+                    },
+                    "sec" => {
+                        if x.args.len() == 1 {
+                            let ex = Interpreter::new(x.args[0].borrow().clone(), self.fn_name.clone());
+                            result =  1.0 / ex.evaluate(gl, assignment_token).cos();
+                        } else {
+                            panic!("You cannot pass no more than 1 value to sec()")
+                        }
+                    },
+                    "ln" => {
+                        if x.args.len() == 1 {
+                            let ex = Interpreter::new(x.args[0].borrow().clone(), self.fn_name.clone());
+                            result =  ex.evaluate(gl, assignment_token).ln();
+                        } else {
+                            panic!("You cannot pass no more than 1 value to sec()")
+                        }
+                    },
+                    "log" => {
+                        if x.args.len() == 2 {
+                            let ex = Interpreter::new(x.args[0].borrow().clone(), self.fn_name.clone());
+                            let base = Interpreter::new(x.args[1].borrow().clone(), self.fn_name.clone());
+                            result =  ex.evaluate(gl, assignment_token).log(base.evaluate(gl, assignment_token));
+                        } else {
+                            panic!("You cannot pass no more than 2 values to log() -> 1: input 2: Base")
+                        }
+                    },
+                    "factorial" => {
+                        if x.args.len() == 1 {
+                            let ex = Interpreter::new(x.args[0].borrow().clone(), self.fn_name.clone());
+                            let mut re = 1;
+                            for n in 1..=ex.evaluate(gl, assignment_token) as i32 {
+                                re *= n
+                            }
+                            result = re as f32;
+                        } else {
+                            panic!("You cannot pass no more than 1 value to factorial()")
+                        }
+                    },
+                    "push" => {
+                        if x.args.len() == 3 {
+                            let mut vec_name: String;
+                            let mut index: u32;
+                            let mut value: f32;
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => vec_name=var.name.value,
+                                _ => panic!("You can only enter vector names to push()")
+                            }
+                            let ex =  Interpreter::new(x.args[1].borrow().clone(), self.fn_name.clone());
+                            index = ex.evaluate(gl, assignment_token) as u32;
+                            let ex =  Interpreter::new(x.args[2].borrow().clone(), self.fn_name.clone());
+                            value = ex.evaluate(gl, assignment_token);
+                            gl.push_vec_value(&vec_name, index as usize, value);
+                            result = value;
+                        } else {
+                            panic!("You cannot pass no more than 3 values to push() 1: Name of the vec 2: index 3: the value you want to push")
+                        }
+                    },
+                    "pop" => {
+                        if x.args.len() == 2 {
+                            let mut vec_name: String;
+                            let mut index: u32;
+                            let mut value: f32;
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => vec_name=var.name.value,
+                                _ => panic!("You can only enter vector names to pop()")
+                            }
+                            let ex =  Interpreter::new(x.args[1].borrow().clone(), self.fn_name.clone());
+                            index = ex.evaluate(gl, assignment_token) as u32;
+                            value = gl.pop_vec_value(&vec_name, index as usize);
+                            result = value;
+                        } else {
+                            panic!("You cannot pass no more than 2 values to push() 1: Name of the vec 2: index")
+                        }
+                    },
+                    
                     str => {
                         if gl.fn_exist(&str.to_string()) {
                                let mut agrsvec = Vec::new();

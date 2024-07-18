@@ -20,13 +20,13 @@ fn read_file(file_path: & String) {
     let mut file_content: String = fs::read_to_string(file_path).unwrap();
     println!("File: {}", file_path);
     let tokens: Vec<Token> = run(&mut file_content);
-    for tok in tokens.iter() {
+    /*for tok in tokens.iter() {
         println!("Token -> {} Value -> {}", tok.kind, tok.value);
-    }
+    }*/
     let parsed = parse(tokens);
-    for pars in parsed.iter(){
+    /*for pars in parsed.iter(){
         println!("{:?}", pars);
-    }
+    }*/
     interpreter_expr(parsed);
 }
 fn interpreter_expr(mut parsed: Vec<Expr>) {
