@@ -14,6 +14,7 @@ pub struct LocalVar {
 
 pub struct Environment<'a> {
     name: &'a str,
+    import_names: Vec<String>,
     var_hash: HashMap<String, f32>,
     vec_hash: HashMap<String, Vec<f32>>,
     fn_store: HashMap<String, Rc<RefCell<Vec<Rc<RefCell<Expr>>>>>>,
@@ -23,8 +24,16 @@ pub struct Environment<'a> {
 
 impl  Environment<'_> {
     pub fn new(name: &str) -> Environment {
-       Environment {name:name, var_hash: HashMap::new(), vec_hash: HashMap::new(), fn_store: 
+       Environment {name:name,import_names: Vec::new(), var_hash: HashMap::new(), vec_hash: HashMap::new(), fn_store: 
         HashMap::new(), fn_local: HashMap::new()}
+    }
+    pub fn check_import<'a>(&'a mut  self, file_name: &String) -> bool {
+        if self.import_names.contains(file_name) {
+            false
+        } else {
+            self.import_names.push(file_name.clone());
+            true
+        }
     }
     pub fn find_var_value<'a>(&'a self, var_name: &String,fn_name: &String) -> &'a f32 {
         if fn_name != &"_".to_string() {
@@ -61,6 +70,14 @@ impl  Environment<'_> {
     }
     pub fn pop_vec_value<'a>(&'a mut self, vec_name: &String, index: usize) ->  f32 {
         self.vec_hash.get_mut(vec_name).unwrap().remove(index)
+        
+    }
+    pub fn snap_vec_value<'a>(&'a mut self, vec_name: &String, value: f32) ->  f32 {
+        self.vec_hash.get_mut(vec_name).unwrap().push(value);
+        value
+    }
+    pub fn len_vec<'a>(&'a mut self, vec_name: &String) ->  i32 {
+        self.vec_hash.get_mut(vec_name).unwrap().len() as i32
         
     }
 

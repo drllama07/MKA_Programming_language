@@ -68,8 +68,14 @@ pub struct VecCall {
     pub name: Token,
     pub index: VariableImpl
 }
+
+#[derive(Debug,Clone)]
+pub struct ImportImpl{
+    pub file_name: String
+}
 #[derive(Debug,Clone)]
 pub enum Expr {
+    Import(ImportImpl),
     Variable(VariableImpl),
     Assignment(AssignmentImpl),
     Fnassign(FnImpl),
@@ -148,8 +154,14 @@ fn parse_expr(tokens: &mut Vec<Token>) -> Expr {
 }
 
 fn parse_assigment(tokens: &mut Vec<Token>) -> Expr {
-
-    if  tokens.len() > 1 && &tokens[tokens.len() -  2 ].kind == &TokenType::Equal {
+    if  tokens.len() > 1 && &tokens[tokens.len() -  1 ].kind == &TokenType::FancyA {
+        match_token(TokenType::FancyA, tokens);
+        match_token(TokenType::Import, tokens);
+        let name = tokens.pop().unwrap().value;
+        
+        return Expr::Import( ImportImpl {file_name: name})
+    }
+    else if  tokens.len() > 1 && &tokens[tokens.len() -  2 ].kind == &TokenType::Equal {
 
         let variable = parse_variable(tokens);
         match_token(TokenType::Equal, tokens);

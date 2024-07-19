@@ -43,11 +43,13 @@ pub enum TokenType {
     PlusEqual,
     Greater,
     MinusEqual,
+    FancyA,
+
 
 
     To,
     In,
-    Return,
+    Import,
     For,
     While,
     Var,
@@ -77,6 +79,7 @@ impl fmt::Display for TokenType {
             TokenType::Exp => write!(f, " ^ "),
             TokenType::Dot => write!(f, "Dot"),
             TokenType::Comma => write!(f, "Comma"),
+            TokenType::FancyA => write!(f, "FancyA"),
             TokenType::Semicolon => write!(f, "Semicolon"),
             TokenType::Bang => write!(f, "Bang"),
             TokenType::BangEqual => write!(f, "BangEqual"),
@@ -88,7 +91,7 @@ impl fmt::Display for TokenType {
             TokenType::PlusEqual => write!(f, "PlusEqual"),
             TokenType::To => write!(f, "To"),
             TokenType::In => write!(f, "In"),
-            TokenType::Return => write!(f, "Return"),
+            TokenType::Import => write!(f, "Import"),
             TokenType::For => write!(f, "For"),
             TokenType::While => write!(f, "While"),
             TokenType::Var => write!(f, "Var"),

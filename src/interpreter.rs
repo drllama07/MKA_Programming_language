@@ -2,8 +2,9 @@
 use std::string;
 use std::rc::Rc;
 use std::cell::RefCell;
+use std::fs;
 
-
+use crate::{parser, scanner};
 use crate::tokens::{Token, TokenType};
 use crate::parser::{Expr, ForImpl};
 use crate::environments::Environment;
@@ -33,6 +34,24 @@ impl Interpreter {
     }
     pub fn evaluate(mut self, gl: &mut Environment, assignment_token: &Token) -> f32 {
         match *self.expr {
+            Expr::Import(x) => {
+                let file_path = x.file_name.clone() + ".mka";
+                if gl.check_import(&x.file_name) {
+                    let mut file_content: String = fs::read_to_string(file_path.clone()).unwrap();
+                    println!("Importing From: {}", file_path);
+                    let tks = scanner::lexer(&mut file_content);
+                    let mut pars = parser::parse(tks);
+                    while pars.len() > 0{
+                        let exp = pars.pop().unwrap();
+                        let inter = Interpreter::new(exp, "_".to_string());
+                        inter.evaluate(gl,  &Token { kind: TokenType::Eof, value: "place holder".to_string() });
+                    }
+                    return 4321.0;
+                } else {
+                    panic!("Error: Import_Error -> You cannot import modules more than onces or import circular: To import a file that is importing the file you are in")
+                }
+                
+            }
             Expr::Number(x) => {
                 return x.value;
             },
@@ -219,6 +238,35 @@ impl Interpreter {
                             result = value;
                         } else {
                             panic!("You cannot pass no more than 2 values to push() 1: Name of the vec 2: index")
+                        }
+                    },
+                    "snap" => {
+                        if x.args.len() == 2 {
+                            let mut vec_name: String;
+                            let mut value: f32;
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => vec_name=var.name.value,
+                                _ => panic!("You can only enter vector names to snap()")
+                            }
+                            let ex =  Interpreter::new(x.args[1].borrow().clone(), self.fn_name.clone());
+                            value = ex.evaluate(gl, assignment_token);
+                            gl.snap_vec_value(&vec_name, value.clone());
+                            result = value;
+                        } else {
+                            panic!("You cannot pass no more than 2 values to snap() 1: Name of the vec 2: value")
+                        }
+                    },
+                    "len" => {
+                        if x.args.len() == 1 {
+                            let mut vec_name: String;
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => vec_name=var.name.value,
+                                _ => panic!("You can only enter vector names to pop()")
+                            }
+                            result = gl.len_vec(&vec_name) as f32
+                            
+                        } else {
+                            panic!("You cannot pass no more than 1 value to len() 1: Name of the vector")
                         }
                     },
                     

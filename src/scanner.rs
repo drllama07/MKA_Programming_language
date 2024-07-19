@@ -7,7 +7,7 @@ pub fn is_num(c: char) -> bool {
 }
 
 pub fn is_letter(c: char) -> bool {
-    let letters = "abcdefghijklmnopqrstuvwxyz";
+    let letters = "_abcdefghijklmnopqrstuvwxyz";
     letters.contains(c)
 }
 
@@ -23,7 +23,7 @@ pub fn is_two_op(st: String) -> TokenType {
 }
 
 pub fn is_identifier(input: &mut String) -> Token {
-    let keywords = vec!["return", "to", "in", "for", "while", "var"];
+    let keywords = vec!["import", "to", "in", "for", "while", "var"];
     let types = vec!["f64"];
 
     let mut name = String::new();
@@ -40,7 +40,7 @@ pub fn is_identifier(input: &mut String) -> Token {
 
     if keywords.contains(&&*name) {
         match name.as_str() {
-            "return" => Token{kind: TokenType::Return, value: name},
+            "import" => Token{kind: TokenType::Import, value: name},
             "to" => Token{kind: TokenType::To, value: name},
             "in" => Token{kind: TokenType::In, value: name},
             "for" => Token{kind: TokenType::For, value: name},
@@ -100,6 +100,7 @@ pub fn matcher(c: char) -> TokenType {
        '<' => TokenType::Less,
        '>' => TokenType::Greater,
        '^' => TokenType::Exp,
+       '@' => TokenType::FancyA,
        _ => todo!()
    }
 }
