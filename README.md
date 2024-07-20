@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="YOUR_REPO_LINK_HERE"><img src="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/PATH_TO_YOUR_LOGO.png" alt="YOUR_APP_NAME" width="200"></a>
+  <a href="YOUR_REPO_LINK_HERE"><img src="https://github.com/drllama07/MKA_Programming_language/blob/master/MKA.png" alt="YOUR_APP_NAME" width="200"></a>
   <br>
   MKA Programming Language
   <br>
