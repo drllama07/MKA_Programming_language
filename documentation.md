@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="YOUR_REPO_LINK_HERE"><img src="https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/main/PATH_TO_YOUR_LOGO.png" alt="YOUR_APP_NAME" width="200"></a>
+  <a href="YOUR_REPO_LINK_HERE"><img src="https://github.com/drllama07/MKA_Programming_language/blob/master/MKA.png" alt="YOUR_APP_NAME" width="200"></a>
   <br>
   MKA Programming Language
   <br>
@@ -15,7 +15,7 @@
   • <a href="#assignment-rules">Assignment Rules</a> <br>
   • <a href="#vectors">Vectors</a> <br>
   • <a href="#for-loops">For Loops</a> <br>
-  • <a href="#builtin-functions">Builtin Functions</a> <br>
+  • <a href="#built-in-functions">Builtin Functions</a> <br>
   • <a href="#functions">Functions</a> <br>
   • <a href="#memory-and-extra-notes">Memory and Extra Notes</a> <br>
   • <a href="#future-topics">Future Topics</a> <br>
@@ -93,7 +93,7 @@ MKA supports fundamental mathematical operations, including addition, subtractio
 ### Data Types: 
 MKA uses f32 as its value storage type. This means that every thing will be used as a float.
 
-You can use `1` or `1.0` while using numbers and thye will all be used as f32 without a problem.
+You can use `1` or `1.0` while using numbers and they will all be used as f32 without a problem.
 ```rust
 1.3 + 2
 2.34 + 33.0
@@ -131,7 +131,7 @@ a_b = 1 + 2 ^ 2
 ```
 - **NOTE:**
 - Use Only Lowercase Letters and Underscores: MKA does not support uppercase letters or numbers in variable names.
-- `e` and `pi` will be assigned to thier mathematical values so do not try to declare or change them.
+- `e` and `pi` will be assigned to their mathematical values so do not try to declare or change them.
 
 After declaring variables you can use them by their names
 ```rust
@@ -211,27 +211,253 @@ foo<3> => Error -> Out of index bounds !!!
 
 
 ## For Loops
-*How to use for loops in MKA.*
+### Definition:
 
-## Builtin Functions
-*List and explanation of builtin functions in MKA.*
+A for loop allows you to execute a block of code repeatedly for a specified number of iterations. It is commonly used to iterate over a range of values or elements in a collection.
+
+1. Syntax:
+```rust
+for i in 0 to 10 {
+    1 * i
+}
+```
+2. After saying `for` you can declare a variable name which will be your loop variable, but choose a name so that it doesnt interrrupt with previous variables.
+   - This variable will be only avaliable while for loop is active then it will be removed from memory.
+   - You can only use it in the for loop.
+3. After loop variable you have to say `in` which refers to the next things starting index.
+   - Starting index should be a integer like vector indexes.
+   - ( >= 0) and not float.
+   - Loop variable will start from that value.
+4. After `to` the ending index will be declared and it has the same rules as starting index.
+   - The ending point is exclusive, meaning the loop will stop before reaching this value.
+
+5. `{ code }` this part contains your loop body and this is the part that will run for n times.
+
+***FOR LOOP RULES***
+```rust
+for i in 0 to 3 {
+    1 * i
+}
+OUTPUT:
+0
+1
+2
+```
+- The loop variable i takes on each value from the starting point (0) to the ending point (10), one at a time.
+- The ending point is not included, so if you set it to 5, it will stop at 4.
+- **NOTE:**
+- Starting and ending indexes should be a variable or number not an operation:
+```rust
+for i in 0 to 1 + 1 {
+    ERROR
+}
+```
+### Mathematics related use cases
+1. [**Sigma:**](https://en.wikipedia.org/wiki/Summation)
+<h1>
+&#931;<sub>i=1</sub><sup>5</sup> i
+</h1>
+
+***MKA version:***
+
+```rust
+ for i in 0 to 6 {
+   sum += i
+ }
+```
+
+*NOTE:* You have to add 1 to the ending index because it ends before reaching the end value.
+
+### More examples:
+
+```rust
+ for i in 0 to 6 {
+   vec<i>
+   12 ^ i
+ }
+```
+
+## Built-in Functions
+
+In MKA, built-in functions provide essential mathematical operations and utilities that simplify calculations and enhance programming efficiency. These functions are pre-defined and ready to use, helping you avoid having to implement common tasks from scratch. Below is an overview of the built-in functions available in MKA.
+
+1. > `print()` for printing out results
+   > The print() function in MKA is used to output values to the console. It can handle multiple arguments, printing each argument on a new line. This function is versatile for displaying results, debugging, and general output.
+   > ```rust
+   > a = 0
+   > vec = <0>
+   > print(1, a, vec<0>, 1 + 1>)
+   > OUTPUT:
+   > -> 1
+   > -> 0
+   > -> 0
+   > -> 2
+
+2. > **Trigonometric Functions**
+   > MKA includes several built-in trigonometric functions to facilitate computations involving angles.
+   > They all take one argument -> `sin(a)`
+   > ***SUPER IMPORTANT*** They all work in `radians` not degrees
+   > List:
+   > sin()
+   > cos()
+   > tan()
+   > cot()
+   > csc()
+   > sec()
+   > 
+   > **Logarithmic Functions**
+   > `ln(a)` has only one argument
+   >
+   > `log(a, base)` a is the input and the second argument will be the base of log.
+   > 
+   > **Factorial**
+   > `factorial(a)` = a! which returns the factorial of a.
+   >
+3. >  **Vector Manipulation Functions**
+   > MKA provides several built-in functions for managing and manipulating vectors, essential for handling sequential data. Here’s an overview of these vector functions:
+   >
+   > `push(vec_name, index, value)`
+   >  Replaces the value at a specific index in the vector vec_name with a new value. This function allows you to update elements at a given position.
+   > ```rust
+   > vec = <1,2>
+   > push(vec, 0, 2)
+   > OUTPUT:
+   > <2,2>
+   > ```
+   >
+   > `pop(vec_name, index)`
+   > Removes the value at that index from the vector vec_name and returns it. This function is useful for removing elements from a vector.
+   > ```rust
+   > vec = <1,2>
+   > pop(vec, 0)
+   > OUTPUT:
+   > <2>
+   > ```
+   >
+   > `snap(vec_name, value)`
+   >  Adds a new value to the end of the vector vec_name. This function allows you to expand the vector by appending elements.
+   > ```rust
+   > vec = <1,2>
+   > snap(vec, 3)
+   > OUTPUT:
+   > <1,2,3>
+   > ```
+   >
+   > `len(vec_name)`
+   > Returns the length of the vector vec_name, i.e., the number of elements it contains.
+   > ```rust
+   > vec = <1,2>
+   > len(vec)
+   > OUTPUT:
+   > 2
+   > ```
+4. *Later updates will introduce new built-in functions or using libraries to expand the possibilities of MKA.
+
+
 
 ## Functions
-*How to define and use functions in MKA.*
+
+
+### What is a Function? 
+
+- Think of a function as a recipe. It takes certain ingredients (called parameters), performs some steps (instructions), and gives you a result (output).
+
+### Functions: A Comparison for Mathematicians and Programmers 
+
+- > [***In Mathematics:***](https://www.desmos.com/calculator?lang=en)
+  > From [Britannica](https://www.britannica.com/science/function-mathematics):
+  > Function, in mathematics, an expression, rule, or law that defines a relationship between one variable (the independent variable) and another variable (the dependent variable). Functions are ubiquitous in mathematics and are essential for formulating physical relationships in the sciences.
+
+- > [***In Programming:***](https://www.geeksforgeeks.org/functions-programming/)
+  > In programming, a function is a block of code designed to perform a specific task. It takes inputs (called parameters), executes a sequence of statements, and returns an output.
+
+### Function Assignment In MKA
+
+1. > ***SYNTAX:***
+   > 
+   > ```rust
+   > fn(parameter1, parameter2) = parameter1 * parameter2
+   >
+   > OR
+   > 
+   > fn(parameter1, parameter2) = {
+   > 
+   >      ...CODE....
+   > 
+   >      print(parameter1 + parameter2)
+   > }
+   > ```
+   >
+   > ***Breakdown of the Syntax:***
+   >
+   > First, type the name of your function -> `bla_bla`
+   > Second, open a `(` and start to type the names of your parameters and separate them using commas.
+   > Close with a `)` and then `=`
+   >
+   > *Single-line functions:* write the body of your function -> ` a + b ^ 7`
+   >
+   > *Multi-line functions:* Open a `{`
+   >
+   > write the body of your code
+   >
+   > close with a `}`
+
+2. > ***Function rules and memory***
+   >
+   > *Parameters*
+   > - When you define a function, you specify parameters—these are like empty containers that will hold values when the function is used. For example, in the function fn(a, b) = { print(a + b) }, a and b are the parameters.
+   > - When a Function Runs: Every time you call a function with specific values, those values are placed into the function's local memory. For instance, if you call fn(5, 3), the values 5 and 3 are temporarily stored in the local memory for a and b.
+   > - After the function completes running, the program losses the access to those parameters and you cannot use them anymore.
+   >
+   > *Return values*
+   > - The [interpreter](src/interpreter.rs) evaluates every single line of a function's body and the last one will be the return value.
+   > - ```rust
+   >   fn(a) = {
+   >       1 + a
+   >       2 + 2
+   >       3 * 4
+   >   }
+   >   OUTPUT: 12
+   >   ```
+   ***SUPER IMPORTANT NOTE:***
+   In MKA everything has a return value even `print()` has a return value. For more details you can take a look at the interpreter.rs and see what things are returned from what.
+   
+3. > ***Calling Functions***
+   > - You can basicly call them with thier names and `()`
+   > - ` fn(1) `
+   > - Each function should be called with the exact number of parameters it expects; otherwise, it may result in errors.
+   > - You can input variables, numbers, vector calls, and operations to functions as parameters.
+   > - But you cannot input function calls as parameters.
+   > - ```rust
+   >   print( 1.0 , vec<0>, 1 + 1, a) => Ok
+   >
+   >   print( fn(1), a , 1) => Error -> Parsing error
+   >   ```
+- *NOTE:* In MKA functions are only allowed to return f32s.
+
 
 ## Memory and Extra Notes
-*Information about memory usage and additional notes.*
+
+1. > ***Multi-File Support***
+   > - MKA allows you to run other .mka files using import method before your main file.
+   > - ```rust
+   >   @import blabla
+   >   ```
+   > - This runs that blabla.mka file and stores the variables, vectors, and functions in that file.
+   > - By doing that you can access those things in your main file by just calling them
+   > - *NOTE:* import statements should be at the beginning of your main file.
+
+## Error Guide
+   
 
 ## Future Topics
-*Topics that are planned for future versions of MKA.*
+
+- ***Calculus library*** -> I will go through calculus questions and while doing that I will implement integration, derivation, and series in MKA.
+- ***Machine learning library*** -> Where I will implement a super tiny XOR problem solving neural network in MKA.
+- ***Graphing feature and an app for easier access*** ->
+- ***MORE***
 
 ## Examples
-*Examples demonstrating various features of MKA.*
+- TODO!
 
-### Example 1: Basic Calculation
-**Explanation**: This example demonstrates a simple arithmetic operation in MKA.
-```mka
-// Example code
-let result = 3 + 5;
-print(result);
 
