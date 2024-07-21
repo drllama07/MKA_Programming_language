@@ -448,16 +448,105 @@ In MKA, built-in functions provide essential mathematical operations and utiliti
    > - *NOTE:* import statements should be at the beginning of your main file.
 
 ## Error Guide
+
+### The Way MKA Programming Language Outputs Errors:
+
+1. > ***PANIC Statements***
+   > `thread 'main' panicked at ... src/code.rs:00:00` This is example of how these statements start and the file path is the place where it paniced.
+   > This panic feature relies on Rust's panic macro that ceases the program if something unexpected happens like syntax or logic errors.
    
+### Memory Related Errors:
 
-## Future Topics
+- > The main file for memory -> [environments.rs](src/environments.rs)
+- > An example: 
+  > ```rust 
+  > aa  = 0
+  > print(a)
+  > 
+  > OUTPUT: 
+  > 
+  > thread 'main' panicked at 'called `Option::unwrap()` on a `None` value', src/environments.rs:46:41
+  > ```
+  > This example depicts an error caused by using an undeclared variable, which returns None.
+  > 
 
-- ***Calculus library*** -> I will go through calculus questions and while doing that I will implement integration, derivation, and series in MKA.
-- ***Machine learning library*** -> Where I will implement a super tiny XOR problem solving neural network in MKA.
-- ***Graphing feature and an app for easier access*** ->
-- ***MORE***
+- ***Vector Errors:***
+  > ```rust 
+  > aa  = <0>
+  > print(a<0>)
+  > 
+  > OUTPUT: 
+  > 
+  > thread 'main' panicked at 'called `Option::unwrap()` on a `None` value', src/environments.rs:62:38
+  > ```
+  > This time the code is trying to call an undeclared vector. Therefore, Memory panics and returns None.
+  > 
+ 
+  > ```rust 
+  > aa  = <>
+  > print(aa<0>)
+  > 
+  > OUTPUT: 
+  > 
+  > thread 'main' panicked at 'index out of bounds: the len is 0 but the index is 0', src/environments.rs:62:10
+  > ```
+  > This happens due to index being out of bounds.
+  > This will happen to `push() , pop(), and snap()` functions too.
 
-## Examples
-- TODO!
+- ***Function Errors:*** 
+  > *Note:*
+  > Every function returns `1234` as their default value.
+
+  > ```rust 
+  > f(a) = a
+  > n = ff(1)
+  > print(n)
+  > 
+  > OUTPUT: 
+  > 
+  > Error -> Fncall no fn named ff is found
+  > -> 1234 
+  > ```
+  > Undeclared function errors will produce a more precise error message and return a default value of 1234.
+
+  > ```rust 
+  > f(a, b) = a * b
+  > n = f(1)
+  > print(n)
+  > 
+  > OUTPUT: 
+  > 
+  > thread 'main' panicked at 'index out of bounds: the len is 1 but the index is 1', src/environments.rs:118:61
+  > ```
+  > Missing parameter inputs will give an index error because parameters are stored in vectors.
+
+### Syntax Related Errors:
+
+- ***Matching Errors:***
+ > MKA uses a function to match tokens throughout the parsing process. Thus, learning its error output will save us some time.
+
+  > ```rust 
+  > for i in 0 10 {  
+  > }
+  > 
+  > OUTPUT: 
+  > 
+  > thread 'main' panicked at 'match_token error: found: Number(10.0) , expected: To ', src/parser.rs:99:17
+  > ```
+  > This error indicates that at the position where 10 is located, the program expects to, which is a syntax rule, as you may recall.
+  >
+  > These errors occur when a syntax rule is breached, causing the program to panic.
 
 
+- ***Miscellaneous Errors:***
+ > `unknown token or syntax ?` means that there is a general error where the program cannot read the code properly. This type of error can be harder to debug.
+
+> For most panic errors, you should follow these steps to resolve them:
+> - Read the Error Message: Carefully read the error message provided. It often includes clues about what went wrong and where.
+> - Check Syntax: Refer to the syntax guide to ensure your code adheres to the language rules. Verify that all keywords, operators, and punctuation are used correctly.
+> - Consult Documentation: Look up relevant sections in the documentation for more details on the error and suggested solutions.
+> - Test Incrementally: Simplify and test smaller portions of your code to isolate the problem and verify its source.
+
+## Conclusion
+
+MKA is a relatively small language, but I hope it proves useful to its users. Over time, I plan to expand and refine it for a wider range of scenarios. Thank you for reading this documentation.

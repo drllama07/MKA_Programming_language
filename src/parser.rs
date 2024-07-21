@@ -96,7 +96,7 @@ fn match_token(expected: TokenType, tokens: &mut Vec<Token>) {
         None => {},
         Some(token) => {
             if expected != token.kind {
-                panic!("match_token error {:?} {} ", token.kind, expected);
+                panic!("match_token error: found: {:?} , expected: {} ", token.kind, expected);
             }
         },
     }

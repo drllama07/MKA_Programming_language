@@ -75,10 +75,22 @@ To learn about MKA you can read the documentation [MKA-Documentation](documentat
 
 >Programming in MKA Basics
 >Learn the fundamentals of programming in MKA.
->Common Errors and How to Resolve Them
+>Common errors and how to resolve them
 >A guide to common errors and their solutions.
 
-# Future Uprgrades and Projects
+# Future Upgrades and Projects
+
+## Upgrade
+
+- A new way to comment in .mka files
+- To make debugging and outputting results easier, future upgrades will include enhanced printing and formatting capabilities
+
+## Future Projects
+
+- ***Calculus library*** -> I will review calculus questions and, while doing so, implement integration, differentiation, and series features in MKA.
+- ***Machine learning library*** -> I will implement a simple XOR problem-solving neural network in MKA.
+- ***Graphing feature and a text editor app for easier access*** -> 
+- ***MKA Physical System Simulations*** -> A new and exciting project???
 
 # *Code Guide*
 
@@ -162,7 +174,7 @@ Over the past year, I’ve been experimenting with Desmos and TI-84 calculators 
 
 - > **Computer Science**
   > - Lexers 
-  > - > **Parsing**
+  > - Parsing
   > - > AST
   > - > Recursive descend parsing
   > - Interpreters and environments
@@ -170,4 +182,6 @@ Over the past year, I’ve been experimenting with Desmos and TI-84 calculators 
 
 
 # License
-- TODO!!!
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
