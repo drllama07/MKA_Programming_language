@@ -355,6 +355,53 @@ impl Interpreter {
                             panic!("You cannot pass no more than 1 value. 1: Name of the matrix")
                         }
                     }
+                    "m_get" => {
+                        if x.args.len() == 3 {
+                            let mut matrix: Vec<Vec<f32>>;
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => {
+                                    matrix = gl.use_matrix(&var.name.value)
+                                }
+                                _ => panic!("You can only enter matrix names")
+                            }
+                            let ex =  Interpreter::new(x.args[1].borrow().clone(), self.fn_name.clone());
+                            let index1 = ex.evaluate(gl, assignment_token) as usize;
+                            let ex =  Interpreter::new(x.args[2].borrow().clone(), self.fn_name.clone());
+                            let index2 = ex.evaluate(gl, assignment_token) as usize;
+                            
+                            result = matrix[index1][index2]
+                            
+                        } else {
+                            panic!("You cannot pass no more than 3 value. 1: Name of the matrix, 2: first index 3: second index")
+                        }
+                    }
+
+                    "m_change" => {
+                        if x.args.len() == 4 {
+                            let mut matrix: Vec<Vec<f32>>;
+                            let mut name: String;
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => {
+                                    name = var.name.value.clone();
+                                    matrix = gl.use_matrix(&var.name.value)
+                                }
+                                _ => panic!("You can only enter matrix names")
+                            }
+                            let ex =  Interpreter::new(x.args[1].borrow().clone(), self.fn_name.clone());
+                            let index1 = ex.evaluate(gl, assignment_token) as usize;
+                            let ex =  Interpreter::new(x.args[2].borrow().clone(), self.fn_name.clone());
+                            let index2 = ex.evaluate(gl, assignment_token) as usize;
+                            
+
+                            let ex =  Interpreter::new(x.args[3].borrow().clone(), self.fn_name.clone());
+                            let value = ex.evaluate(gl, assignment_token);
+                            matrix[index1][index2] = value;
+                            
+                            gl.add_matrix(name, matrix)
+                        } else {
+                            panic!("You cannot pass no more than 4 value. 1: Name of the matrix, 2: first index 3: second index 4: value")
+                        }
+                    }
 
                     "m_star" => {
                         if x.args.len() == 3 {
@@ -372,6 +419,39 @@ impl Interpreter {
                             for y in 0..matrix.len() {
                                 for x in 0..matrix[0].len() {
                                     matrix[y][x] = matrix[y][x] * number
+                                }
+                            }
+                            let mut output_name: String;
+                            match x.args[2].borrow().clone() {
+                                Expr::Variable(var) => {
+                                    output_name = var.name.value  
+                                }
+                                _ => panic!("You can only enter matrix names")
+                            }
+                            
+                            gl.add_matrix(output_name, matrix)
+                            
+                            
+                        } else {
+                            panic!("You cannot pass no more than 3 value. 1: Name of the matrix 2: value of operation 3: output matrix name")
+                        }
+                    },
+                    "m_plus" => {
+                        if x.args.len() == 3 {
+                            let mut matrix: Vec<Vec<f32>>;
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => {
+                                    matrix = gl.use_matrix(&var.name.value);  
+                                }
+                                _ => panic!("You can only enter matrix names")
+                            }
+
+                            let ex =  Interpreter::new(x.args[1].borrow().clone(), self.fn_name.clone());
+                            let number  = ex.evaluate(gl, assignment_token);
+
+                            for y in 0..matrix.len() {
+                                for x in 0..matrix[0].len() {
+                                    matrix[y][x] = matrix[y][x] + number
                                 }
                             }
                             let mut output_name: String;

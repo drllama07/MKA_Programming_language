@@ -13,6 +13,8 @@
 
 - Now you can manipulate 2D matrices in MKA, opening up even more use scenarios.
 
+***NOTE:*** This new update is not fully documented and tested. Therefore, this new features might contain bugs.
+
 ## Syntax
 
 - An example of declaring a matrix:
@@ -27,7 +29,7 @@
 
 ## Matrix Operations
 - Unlike other data types, matrices can only be used within matrix functions.
-- Furthermore, matrices cannot be indexed or modified like vectors.
+- Furthermore, matrices cannot be indexed or modified like vectors. But, using special functions you can access them.
 
 - ***MATRIX FUNCTIONS:***
 - > **Matrix Multiplication:**
@@ -46,6 +48,13 @@
   > m_star(matrix_name, 1+ 1, output_name)
   > ``` 
   > This time every elemnt in matrix_name will be multiplied by the second parameters value.
+- > **Element-wise Addition:**
+  > 
+  > Example: 
+  > ```rust 
+  > m_plus(matrix_name, 1+ 1, output_name)
+  > ``` 
+  > This time every elemnt in matrix_name will be added by the second parameters value.
 - > **Printing Matrices** 
   > ```rust 
   > m_print(matrix_name)
@@ -54,6 +63,17 @@
   > -- [] -- 
   > -- [] -- 
   > ```
+
+- > **Accessing Elements**
+  > 
+  > ```rust 
+  > m_get(matrix_name, first_index, second_index)
+  > OUTPUT:
+  > f32
+  > m_change(matrix_name, first_index, second_index, new_value)
+  > ```
+  > These functions will allow you to access values and change them by indexes
+
 
 ## Conclusion 
 - For error guide about matrices MKA will output what is the error in the code.
