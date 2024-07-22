@@ -19,7 +19,7 @@
   • <a href="#functions">Functions</a> <br>
   • <a href="#memory-and-extra-notes">Memory and Extra Notes</a> <br>
   • <a href="#future-topics">Future Topics</a> <br>
-  • <a href="#examples">Examples</a>
+  • <a href="matrices.md">Matrices in MKA</a>
 </p>
 
 ## Introduction

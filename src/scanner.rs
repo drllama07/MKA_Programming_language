@@ -86,6 +86,8 @@ pub fn matcher(c: char) -> TokenType {
    match c {
        '(' => TokenType::LeftParen,
        ')' => TokenType::RightParen,
+       '[' => TokenType::LeftBracket,
+       ']' => TokenType::RightBracket,
        '{' => TokenType::LeftBrace,
        '}' => TokenType::RightBrace,
        '!' => TokenType::Bang,
@@ -93,6 +95,7 @@ pub fn matcher(c: char) -> TokenType {
        '-' => TokenType::Minus,
        '=' => TokenType::Equal,
        '*' => TokenType::Star,
+       '#' => TokenType::Square,
        '/' => TokenType::Slash,
        ',' => TokenType::Comma,
        ';' => TokenType::Semicolon,

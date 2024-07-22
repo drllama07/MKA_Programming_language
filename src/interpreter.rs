@@ -1,4 +1,5 @@
 
+use std::process::Output;
 use std::string;
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -51,6 +52,29 @@ impl Interpreter {
                     panic!("Error: Import_Error -> You cannot import modules more than onces or import circular: To import a file that is importing the file you are in")
                 }
                 
+            },
+            Expr::Matrices(x) => {
+                let xlen: &usize = &x.matrix[0].len();
+                let mut final_vec:Vec<Vec<f32>> = Vec::new();
+                let name = x.name.value;
+                for vars in x.matrix.iter() {
+                    let mut line_vec:Vec<f32> = Vec::new();
+                    if &vars.len() != xlen {
+                        panic!("Error: Matrices -> {} == {} row lengths must be equal!!", &vars.len(), xlen);
+                    }
+                    for var in vars.iter() {
+                        match var.name.kind {
+                            TokenType::Number(y) => line_vec.push(y),
+                            TokenType::Id => {
+                               line_vec.push(*gl.find_var_value(&var.name.value, &self.fn_name));
+                            },
+                            _ => panic!("Error -> Matrix_Assigment"),
+                        }
+                    }
+                    final_vec.push(line_vec)
+                };
+                gl.add_matrix(name, final_vec);
+                return -1.0;
             }
             Expr::Number(x) => {
                 return x.value;
@@ -110,12 +134,12 @@ impl Interpreter {
                 } else if  x.op == TokenType::MinusEqual{
                      val = expr.evaluate(gl, &x.target.name) - gl.find_var_value(&x.target.name.value, &self.fn_name);
                 } else {
-                    panic!("Not implemented yet other double operations!");
+                    panic!("Not implemented other double operations!");
                 }
-                if !self.vec_assign {
+                /*if !self.vec_assign {
                     gl.add_var(x.target.name.value, val);
                     self.vec_assign = false;
-                }
+                }*/
                 return val;
             },
             Expr::Fncall(x) => {
@@ -261,7 +285,7 @@ impl Interpreter {
                             let mut vec_name: String;
                             match x.args[0].borrow().clone() {
                                 Expr::Variable(var) => vec_name=var.name.value,
-                                _ => panic!("You can only enter vector names to pop()")
+                                _ => panic!("You can only enter vector names")
                             }
                             result = gl.len_vec(&vec_name) as f32
                             
@@ -269,6 +293,102 @@ impl Interpreter {
                             panic!("You cannot pass no more than 1 value to len() 1: Name of the vector")
                         }
                     },
+
+                    "m_mult" => {
+                        if x.args.len() == 3 {
+                            let mut m1_name: String;
+                            let mut m2_name: String;
+                            let mut output_name :String;
+                            let mut output_matrix = Vec::new();
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => m1_name=var.name.value,
+                                _ => panic!("You can only enter matrix names")
+                            }
+
+                            match x.args[1].borrow().clone() {
+                                Expr::Variable(var) => m2_name=var.name.value,
+                                _ => panic!("You can only enter matrix names")
+                            }
+
+                            match x.args[2].borrow().clone() {
+                                Expr::Variable(var) => output_name=var.name.value,
+                                _ => panic!("You can only enter matrix names")
+                            }
+
+                            let matrix1 = gl.use_matrix(&m1_name);
+                            let matrix2 = gl.use_matrix(&m2_name);
+
+                            assert!(matrix1[0].len() == matrix2.len(), "Due to matrix multiplication rules these matrices are incompatible");
+                            for m in 0..matrix1.len() {
+                               let mut line_mat = Vec::new();
+                               for p in 0..matrix2[0].len() {
+                                      let mut tmp = 0.0;
+                                      for n in 0..matrix1[0].len() {
+                                          tmp += matrix1[m][n] * matrix2[n][p]
+                                      }
+                                      line_mat.push(tmp)
+                               }
+                               output_matrix.push(line_mat)
+                            }
+                            
+                            gl.add_matrix(output_name, output_matrix);
+                            
+                        } else {
+                            panic!("You cannot pass no more than 3 value to m_mult() 1: Name of a matrix, 2: name of a matrix, 3: The name of the output Matrix")
+                        }
+                    },
+
+                    "m_print" => {
+                        if x.args.len() == 1 {
+                            
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => {
+                                    for line in gl.use_matrix(&var.name.value) {
+                                        println!(" -- {:?} -- ", line);
+                                    };
+                                }
+                                _ => panic!("You can only enter matrix names")
+                            }
+                            
+                            
+                        } else {
+                            panic!("You cannot pass no more than 1 value. 1: Name of the matrix")
+                        }
+                    }
+
+                    "m_star" => {
+                        if x.args.len() == 3 {
+                            let mut matrix: Vec<Vec<f32>>;
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => {
+                                    matrix = gl.use_matrix(&var.name.value);  
+                                }
+                                _ => panic!("You can only enter matrix names")
+                            }
+
+                            let ex =  Interpreter::new(x.args[1].borrow().clone(), self.fn_name.clone());
+                            let number  = ex.evaluate(gl, assignment_token);
+
+                            for y in 0..matrix.len() {
+                                for x in 0..matrix[0].len() {
+                                    matrix[y][x] = matrix[y][x] * number
+                                }
+                            }
+                            let mut output_name: String;
+                            match x.args[2].borrow().clone() {
+                                Expr::Variable(var) => {
+                                    output_name = var.name.value  
+                                }
+                                _ => panic!("You can only enter matrix names")
+                            }
+                            
+                            gl.add_matrix(output_name, matrix)
+                            
+                            
+                        } else {
+                            panic!("You cannot pass no more than 3 value. 1: Name of the matrix 2: value of operation 3: output matrix name")
+                        }
+                    }
                     
                     str => {
                         if gl.fn_exist(&str.to_string()) {

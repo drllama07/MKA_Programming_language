@@ -14,6 +14,7 @@ pub struct Environment<'a> {
     import_names: Vec<String>,
     var_hash: HashMap<String, f32>,
     vec_hash: HashMap<String, Vec<f32>>,
+    matrix_hash: HashMap<String, Vec<Vec<f32>>>,
     fn_store: HashMap<String, Rc<RefCell<Vec<Rc<RefCell<Expr>>>>>>,
     fn_local: HashMap<String, LocalVar>,
     
@@ -21,8 +22,7 @@ pub struct Environment<'a> {
 
 impl  Environment<'_> {
     pub fn new(name: &str) -> Environment {
-       let mut new = Environment {name:name,import_names: Vec::new(), var_hash: HashMap::new(), vec_hash: HashMap::new(), fn_store: 
-        HashMap::new(), fn_local: HashMap::new()};
+       let mut new = Environment {name:name,import_names: Vec::new(), var_hash: HashMap::new(), vec_hash: HashMap::new(),matrix_hash: HashMap::new(), fn_store: HashMap::new(), fn_local: HashMap::new()};
         new.var_hash.insert("e".to_string(), 2.718281);
         new.var_hash.insert("pi".to_string(), 3.141592);
         new
@@ -35,6 +35,18 @@ impl  Environment<'_> {
             true
         }
     }
+
+    pub fn add_matrix(&mut self, mat_name: String, mat_value: Vec<Vec<f32>>) {
+        if self.matrix_hash.contains_key(&mat_name){
+             self.matrix_hash.remove(&mat_name);
+        }
+        self.matrix_hash.insert(mat_name, mat_value);
+    }
+
+    pub fn use_matrix<'a>(&'a self, mat_name: &String) -> Vec<Vec<f32>> {
+        self.matrix_hash.get(mat_name).unwrap().clone()
+    }
+
     pub fn find_var_value<'a>(&'a self, var_name: &String,fn_name: &String) -> &'a f32 {
         if fn_name != &"_".to_string() {
             

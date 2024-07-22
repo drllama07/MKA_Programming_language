@@ -1,6 +1,7 @@
 
 
-use std::rc::Rc;
+use core::panic;
+use std::{io::LineWriter, rc::Rc};
 use std::cell::RefCell;
 use crate::tokens::{self, Token, TokenType};
 
@@ -73,6 +74,12 @@ pub struct VecCall {
 pub struct ImportImpl{
     pub file_name: String
 }
+
+#[derive(Debug,Clone)]
+pub struct MatrixImpl {
+    pub name: Token,
+    pub matrix: Vec<Vec<VariableImpl>>
+}
 #[derive(Debug,Clone)]
 pub enum Expr {
     Import(ImportImpl),
@@ -87,6 +94,7 @@ pub enum Expr {
     Veccall(VecCall),
     Forloop(ForImpl),
     Double(DoubleImpl),
+    Matrices(MatrixImpl),
     Useless
     
 }
@@ -161,6 +169,34 @@ fn parse_assigment(tokens: &mut Vec<Token>) -> Expr {
         
         return Expr::Import( ImportImpl {file_name: name})
     }
+    // Matrices
+    if  tokens.len() > 1 && &tokens[tokens.len() -  1 ].kind == &TokenType::Square {
+        match_token(TokenType::Square, tokens);
+        let mut matrix: MatrixImpl;
+        let name = tokens.pop().unwrap();
+        match name.kind {
+             TokenType::Id =>  matrix = MatrixImpl {name: name, matrix: Vec::new()},
+             _ => panic!("You cannot not assign a matrix to a non-id")
+        }
+        match_token(TokenType::Equal, tokens);
+        
+        
+        let token = tokens.pop().unwrap();
+        if token.kind == TokenType::LeftBrace {
+          while &tokens[&tokens.len()-1].kind != &TokenType::RightBrace {
+              match &tokens[&tokens.len()-1].kind {
+                &TokenType::Eof => match_token(TokenType::Eof, tokens),
+                _ => matrix.matrix.push(parse_matrix(tokens)),
+              }
+         }
+         match_token(TokenType::RightBrace, tokens);
+         return  Expr::Matrices(matrix);
+        } else {
+                panic!("You must use braces for the defining a matrix!! {}", token.kind)
+        }
+
+        
+    }
     else if  tokens.len() > 1 && &tokens[tokens.len() -  2 ].kind == &TokenType::Equal {
 
         let variable = parse_variable(tokens);
@@ -210,6 +246,32 @@ fn parse_variable(tokens: &mut Vec<Token>) -> VariableImpl {
            return VariableImpl { name: token};
     } else {
         panic!("Error -> Parsing_Variable: Unknown type of token{}", token.kind);
+    }
+}
+
+fn parse_matrix(tokens: &mut Vec<Token>) -> Vec<VariableImpl> {
+    match tokens.pop().unwrap().kind {
+        TokenType::LeftBracket => {
+          let mut line_matrix: Vec<VariableImpl> = Vec::new();
+          while &tokens[&tokens.len() -1].kind != &TokenType::RightBracket{
+            let tok = tokens.pop().unwrap();
+            match tok.kind {
+            TokenType::Id => line_matrix.push(VariableImpl {name: tok}),
+            TokenType::Number(x) => line_matrix.push(VariableImpl {name: tok}),
+            TokenType::Comma => {
+                   match &tokens[tokens.len() -1 ].kind {
+                    &TokenType::Number(x) => {},
+                    &TokenType::Id => {},
+                    _ => panic!("You need a element after , "),
+                   } 
+               },
+            _ => panic!("error no use like this for matrices{:?}", tok)
+            }
+         }
+         match_token(TokenType::RightBracket, tokens);
+         return line_matrix;
+        },
+        _ => panic!("You must use [] to create a matrix")
     }
 }
 

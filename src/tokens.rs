@@ -25,6 +25,8 @@ pub enum TokenType {
 
     LeftParen,
     RightParen,
+    LeftBracket,
+    RightBracket,
     LeftBrace,
     RightBrace,
     Plus,
@@ -44,6 +46,7 @@ pub enum TokenType {
     Greater,
     MinusEqual,
     FancyA,
+    Square,
 
 
 
@@ -70,6 +73,8 @@ impl fmt::Display for TokenType {
             TokenType::Whitespace(val) => write!(f, "Whitespace({})", val),
             TokenType::LeftParen => write!(f, "LeftParen"),
             TokenType::RightParen => write!(f, "RightParen"),
+            TokenType::LeftBracket => write!(f, "LeftBracket"),
+            TokenType::RightBracket => write!(f, "RightBracket"),
             TokenType::LeftBrace => write!(f, "LeftBrace"),
             TokenType::RightBrace => write!(f, "RightBrace"),
             TokenType::Plus => write!(f, "Plus"),
@@ -77,6 +82,7 @@ impl fmt::Display for TokenType {
             TokenType::Star => write!(f, "Star"),
             TokenType::Slash => write!(f, "Slash"),
             TokenType::Exp => write!(f, " ^ "),
+            TokenType::Square => write!(f, "#"),
             TokenType::Dot => write!(f, "Dot"),
             TokenType::Comma => write!(f, "Comma"),
             TokenType::FancyA => write!(f, "FancyA"),
