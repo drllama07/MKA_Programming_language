@@ -131,8 +131,10 @@ impl Interpreter {
                 let mut val: f32;
                 if x.op == TokenType::PlusEqual {
                      val = expr.evaluate(gl, &x.target.name) + gl.find_var_value(&x.target.name.value, &self.fn_name);
+                     gl.add_var(x.target.name.value, val);
                 } else if  x.op == TokenType::MinusEqual{
                      val = expr.evaluate(gl, &x.target.name) - gl.find_var_value(&x.target.name.value, &self.fn_name);
+                     gl.add_var(x.target.name.value, val);
                 } else {
                     panic!("Not implemented other double operations!");
                 }
@@ -145,7 +147,21 @@ impl Interpreter {
             Expr::Fncall(x) => {
                 let mut result: f32 = 1234.0;
                 match x.name.value.as_str() {
-                     "print" => {
+                     "print_var" => {  
+                        if x.args.len() == 1 {
+                           let string = x.args[x.args.len() -1].borrow().clone();
+                           match string {
+                                 Expr::Variable(vars) => {   
+                                     println!("--> {}", vars.name.value);
+                                 }
+                                 _ => panic!("You must input a variable name as the first argument, which will be printed as String!!")
+                           }
+                           
+                        } else {
+                            panic!("print_var only takes 1 argument!!!!")
+                        }
+                    },
+                    "print" => {
                         for var in x.args.iter() {
                             let ex = Interpreter::new(var.borrow().clone(), self.fn_name.clone());
                             println!("-> {} ", ex.evaluate(gl, assignment_token));
@@ -318,7 +334,7 @@ impl Interpreter {
                             let matrix1 = gl.use_matrix(&m1_name);
                             let matrix2 = gl.use_matrix(&m2_name);
 
-                            assert!(matrix1[0].len() == matrix2.len(), "Due to matrix multiplication rules these matrices are incompatible");
+                            assert!(matrix1[0].len() == matrix2.len(), "Due to matrix multiplication rules these matrices are incompatible {} -> {} {} -> {}",m1_name, matrix1[0].len(),m2_name, matrix2.len());
                             for m in 0..matrix1.len() {
                                let mut line_mat = Vec::new();
                                for p in 0..matrix2[0].len() {
@@ -343,6 +359,7 @@ impl Interpreter {
                             
                             match x.args[0].borrow().clone() {
                                 Expr::Variable(var) => {
+                                    println!("{}", &var.name.value);
                                     for line in gl.use_matrix(&var.name.value) {
                                         println!(" -- {:?} -- ", line);
                                     };
@@ -467,6 +484,41 @@ impl Interpreter {
                             
                         } else {
                             panic!("You cannot pass no more than 3 value. 1: Name of the matrix 2: value of operation 3: output matrix name")
+                        }
+                    }
+
+                    "m_trans" => {
+                        if x.args.len() == 2 {
+                            let mut matrix: Vec<Vec<f32>>;
+                            let mut final_m: Vec<Vec<f32>> = Vec::new();
+                            match x.args[0].borrow().clone() {
+                                Expr::Variable(var) => {
+                                    matrix = gl.use_matrix(&var.name.value);  
+                                }
+                                _ => panic!("You can only enter matrix names")
+                            }
+
+
+                            for y in 0..matrix[0].len() {
+                                let mut line = Vec::new();
+                                for x in 0..matrix.len() {
+                                    line.push(matrix[x][y])
+                                }
+                                final_m.push(line)
+                            }
+                            let mut output_name: String;
+                            match x.args[1].borrow().clone() {
+                                Expr::Variable(var) => {
+                                    output_name = var.name.value  
+                                }
+                                _ => panic!("You can only enter matrix names")
+                            }
+                            
+                            gl.add_matrix(output_name, final_m)
+                            
+                            
+                        } else {
+                            panic!("You cannot pass no more than 2 value. 1: Name of the matrix  2: output matrix name")
                         }
                     }
                     

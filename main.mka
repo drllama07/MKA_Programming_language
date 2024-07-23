@@ -1,7 +1,7 @@
 
 # x = {
-    [0, 1, 1 ,0]
-    [0, 1, 0, 1]
+    [0, 0, 0 ,0.3]
+    [0.7, 0.5, 0, 0.2]
 }
 y = < 0, 0, 1, 1>
 
@@ -10,19 +10,20 @@ m = len(y)
 
 
 # w_two = {
-    [0, 0]
-    [0.2, 0.3]
+    [0.1, 0.1]
+    [0.1, 0.1]
 }
 b_two = <0, 0>
 
 # w_three = {
-    [0.1, 0.2, 0.3]
-    [0, 0, 0]
+    [0.1,0.1]
+    [0.1,0.1]
+    [0.1,0.1]
 }
 b_three = <0, 0, 0>
 
 # w_final = {
-    [0, 0, 0]
+    [0.1, 0.1, 0.1]
 }
 b_final = 0
 
@@ -40,158 +41,240 @@ sigmoid(z) = {
     1 / (1 + e ^ (-z))
 }
 
-fn(xa, xb, wa, wb, b) = {
-     z = xa * wa +  xb * wb + b
-     tanh(z)
-}
 
-final(xa, xb,xc, wa, wb, wc, b) = {
-     z = xa * wa +  xb * wb + wc * xc + b
-     sigmoid(z)
-}
 
 loss(a, y) = {
-    -y * log(a) - (1 - y) * log(1-a)
+    -y * log(a + 0.001, 2) + (1 - y) * log(1-a + 0.001, 2)
 }
+
 
 
 prediction() = {
-     layer_a = <0, 0, 0,0>
-     layer_b = <0,0,0,0>
-     tmp = 0
-     for i in 0 to m {
-        tmp = fn(xa<i>, xb<i>, w_two_a<0>, w_two_b<0>, b<0>)
-        push(layer_a, i, tmp)
-        tmp = fn(xa<i>, xb<i>, w_two_a<1>, w_two_b<1>, b<1>)
-        push(layer_b, i, tmp)
+    
+     m_mult(w_two, x, z)
+     for i in 0 to 2 {
+        tm = m_get(z, i, 0)
+        m_change(z, i, 0, tm + b_two<i>)
+        tm = m_get(z, i, 1)
+        m_change(z, i, 1, tm + b_two<i>)
+        tm = m_get(z, i, 2)
+        m_change(z, i, 2, tm + b_two<i>)
+        tm = m_get(z, i, 3)
+        m_change(z, i, 3, tm + b_two<i>)
+     }
+
+     for ij in 0 to 2 {
+        for ji in 0 to 4{
+            tm = m_get(z, ij, ji)
+            tm = tanh(tm)
+            m_change(z, ij, ji, tm)
+        }
      }
 
 
-     layer_three_a = <0, 0, 0,0>
-     layer_three_b = <0, 0, 0,0>
-     layer_three_c = <0, 0, 0,0>
 
-     tmp = 0
-     for i in 0 to m {
-        tmp = fn(layer_a<i>, layer_b<i>, w_three_a<0>, w_three_b<0>, b_three<0>)
-        push(layer_three_a, i, tmp)
-        tmp = fn(layer_a<i>, layer_b<i>, w_three_a<1>, w_three_b<1>, b_three<1>)
-        push(layer_three_b, i, tmp)
-        tmp = fn(layer_a<i>, layer_b<i>, w_three_a<2>, w_three_b<2>, b_three<2>)
-        push(layer_three_c, i, tmp)
+    m_mult(w_three, z, z_second)
+    for i in 0 to 3 {
+        tm = m_get(z_second, i, 0)
+        m_change(z_second, i, 0 ,tm + b_three<i>)
+        tm = m_get(z_second, i, 1)
+        m_change(z_second, i, 1 ,tm + b_three<i>)
+        tm = m_get(z_second, i, 2)
+        m_change(z_second, i, 2 ,tm + b_three<i>)
+        tm = m_get(z_second, i, 3)
+        m_change(z_second, i, 3 ,tm + b_three<i>)
+    }
+
+    for ij in 0 to 3 {
+        for ji in 0 to 4 {
+            tm = m_get(z_second, ij, ji)
+            tm = tanh(tm)
+            m_change(z_second, ij, ji, tm)
+        }
      }
-     output = <0, 0 , 0, 0>
-     for i in 0 to m {
-        tmp = final(layer_three_a<i>, layer_three_b<i>,layer_three_c<i>,w_final<0>, w_final<1>, w_final<2>, b_final)
-        push(output, i, tmp)
-     }
+    
+
+
+    m_mult(w_final, z_second, z_final)
+    m_plus(z_final, b_final, predictions)
+    
      
 }
 
-gradient_descent() =  {
+
+gradient_descent(epoch) =  {
       prediction()
       tmp = 0
       for i in 0 to m {
-        tmp += loss(output<i>, y<i>)
+        output = m_get(predictions, 0, i)
+        ll = loss(output, y<i>)
+        tmp += ll
       }
       cost = tmp / m
-      print(cost)
-
-     dw_final = <0,0,0>
-     tmp = 0
-     for i in 0 to m {
-        tmp += (output<i> - y<i>) * layer_three_a<i>
-     }
-     push(dw_final, 0, tmp/m)
-
-     tmp = 0
-     for i in 0 to m {
-        tmp += (output<i> - y<i>) * layer_three_b<i>
-     }
-     push(dw_final, 1, tmp/m)
-
-     tmp = 0
-     for i in 0 to m {
-        tmp += (output<i> - y<i>) * layer_three_c<i>
-     }
-     push(w_three_a, 2, tmp/m)
-
-     tmp = 0
-     for i in 0 to m {
-        tmp += (output<i> - y<i>)
-     }
-     b_final -= tmp / m
-     
-
-     dz_three_a = <0,0,0, 0>
-     dz_three_b = <0,0,0, 0>
-     dz_three_c = <0,0,0, 0>
-     tmp = 0  
-     for i in 0 to m {
-        tmp = dw_final<0> * (output<i> - y<i>) * d_tanh(layer_three_a<i>)
-        push(dz_three_a, i, tmp)
-     }
-     for i in 0 to m {
-        tmp = dw_final<1> * (output<i> - y<i>) * d_tanh(layer_three_b<i>)
-        push(dz_three_b, i, tmp)
-     }
-     for i in 0 to m {
-        tmp = dw_final<2> * (output<i> - y<i>) * d_tanh(layer_three_c<i>)
-        push(dz_three_c, i, tmp)
-     }
-      
-   
-     dw_three_a = <0.0, 0.0, 0.0>
-     dw_three_b = <0.0, 0.0, 0.0>
-     db_three = <0, 0, 0>
-     tmp = 0 
-     for i in 0 to m {
-         tmp += dz_three_a<i> * layer_a<i>
-     }
-     push(dw_three_a, 0, tmp/m)
-
-     tmp = 0 
-     for i in 0 to m {
-         tmp += dz_three_b<i> * layer_a<i>
-     }
-     push(dw_three_a, 1, tmp/m)
-
-     tmp = 0 
-     for i in 0 to m {
-         tmp += dz_three_c<i> * layer_a<i>
-     }
-     push(dw_three_a, 2, tmp/m)
-
-     tmp = 0 
-     for i in 0 to m {
-         tmp += dz_three_a<i> * layer_b<i>
-     }
-     push(dw_three_b, 0, tmp/m)
-
-     tmp = 0 
-     for i in 0 to m {
-         tmp += dz_three_b<i> * layer_b<i>
-     }
-     push(dw_three_b, 1, tmp/m)
-
-     tmp = 0 
-     for i in 0 to m {
-         tmp += dz_three_c<i> * layer_b<i>
-     }
-     push(dw_three_b, 2, tmp/m)
+      print_var(epoch)
+      print(epoch, cost)
 
      
+     dz_final = <>
+     for i in 0 to m {
+        output = m_get(z_final, 0, i)
+        snap(dz_final, output - y<i>)
+     }
+     a = dz_final<0>
+     b = dz_final<1>
+     c = dz_final<2>
+     d = dz_final<3>
+     # dz_final = {
+        [a, b, c ,d]
+     }
+     m_trans(z_second, z_st)
 
-
-
-
-
-
-
-
+     m_mult(dz_final, z_st, dw_final)
+     m_star(dw_final, 1/m , dw_final)
 
      for i in 0 to 3 {
-        tmp = w_final<i> - dw_final<i>
-        push(w_final, i, tmp)
-     } 
+        tmp = m_get(w_final, 0 ,i) - (m_get(dw_final, 0 ,i)* 0.1)
+        m_change(w_final, 0, i, tmp )
+     }
+
+     db_final = 0 
+     for i in 0 to m {
+           db_final += dz_final<i>
+     }
+     b_final -= (db_final / m) * 0.1
+
+
+     m_trans(w_final, w_ft)
+     m_mult(w_ft, dz_final, dz_three)
+
+     for ij in 0 to 3 {
+         for ji in 0 to 4 {
+            tmp = m_get(z_second, ij, ji)
+            tm = m_get(dz_three, ij, ji)
+            m_change(dz_three, ij, ji, tmp * tm)
+        }
+     }
+
+     m_trans(z, z_t) 
+     m_mult(dz_three, z_t, dw_three)
+     m_star(dw_three, 1/m , dw_three)
+
+     for i in 0 to 3 {
+         for j in 0 to 2 {
+            tmp = m_get(w_three, i ,j) - (m_get(dw_three, i ,j)* 0.1)
+            m_change(w_three, i, j, tmp)
+         }
+     }
+
+
+     tmp = 0
+     for i in 0 to 3 {
+           tmp = 0
+           for j in 0 to 4 {
+               tmp += m_get(dz_three, i, j) * 0.1
+           }
+           push(b_three, i, b_three<i> - tmp)
+     }
+
+     m_trans(w_three, w_three_t)
+     m_mult(w_three_t, dz_three, dz_two)
+
+     for ij in 0 to 2 {
+         for ji in 0 to 4 {
+            tmp = m_get(z, ij, ji)
+            tm = m_get(dz_two, ij, ji)
+            m_change(dz_two, ij, ji, tmp * tm)
+        }
+     }
+
+     m_trans(x, x_t)
+     m_mult(dz_two, x_t, dw_two)
+     m_star(dw_two, 1/m , dw_two)
+
+     for i in 0 to 2 {
+         for j in 0 to 2 {
+            tmp = m_get(w_two, i ,j) - (m_get(dw_two, i ,j)* 0.1)
+            m_change(w_two, i, j, tmp)
+         }
+     }
+
+     for i in 0 to 2 {
+           tmp = 0
+           for j in 0 to 4 {
+               tmp += m_get(dz_two, i, j) * 0.1
+           }
+           push(b_two, i, b_two<i> - tmp)
+     }
+
 }
+
+for epoch in 0 to 100 {
+    gradient_descent(epoch)
+}
+
+
+
+
+test() = {
+     # test_x = {
+               [1, 0, 0.2 ,0.5]
+               [1, 0, 0.4, 0.5]
+     }
+     test_y = <0, 1, 1, 0> 
+     m_mult(w_two, test_x, z)
+     for i in 0 to 2 {
+        tm = m_get(z, i, 0)
+        m_change(z, i, 0, tm + b_two<i>)
+        tm = m_get(z, i, 1)
+        m_change(z, i, 1, tm + b_two<i>)
+        tm = m_get(z, i, 2)
+        m_change(z, i, 2, tm + b_two<i>)
+        tm = m_get(z, i, 3)
+        m_change(z, i, 3, tm + b_two<i>)
+     }
+
+     for ij in 0 to 2 {
+        for ji in 0 to 4 {
+            tm = m_get(z, ij, ji)
+            tm = tanh(tm)
+            m_change(z, ij, ji, tm)
+        }
+     }
+
+
+
+    m_mult(w_three, z, z_second)
+    for i in 0 to 3 {
+        tm = m_get(z_second, i, 0)
+        m_change(z_second, i, 0 ,tm + b_three<i>)
+        tm = m_get(z_second, i, 1)
+        m_change(z_second, i, 1 ,tm + b_three<i>)
+        tm = m_get(z_second, i, 2)
+        m_change(z_second, i, 2 ,tm + b_three<i>)
+        tm = m_get(z_second, i, 3)
+        m_change(z_second, i, 3 ,tm + b_three<i>)
+    }
+
+    for ij in 0 to 3 {
+        for ji in 0 to 4 {
+            tm = m_get(z_second, ij, ji)
+            tm = tanh(tm)
+            m_change(z_second, ij, ji, tm)
+        }
+     }
+    
+
+
+    m_mult(w_final, z_second, z_final)
+    m_plus(z_final, b_final, predictions)
+    
+
+    print_var(test_output)
+    for i in 0 to 4 {
+        print(test_y<i>)
+    }
+
+    m_print(predictions)
+}
+
+test()

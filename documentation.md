@@ -292,6 +292,13 @@ In MKA, built-in functions provide essential mathematical operations and utiliti
    > -> 0
    > -> 0
    > -> 2
+   > ```
+   > `print_var` for print single variable names.
+   > ```rust
+   > print_var(variable)
+   > OUTPUT:
+   > -> variable
+   > ```
 
 2. > **Trigonometric Functions**
    > MKA includes several built-in trigonometric functions to facilitate computations involving angles.
